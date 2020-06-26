@@ -45,18 +45,16 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
             console.log("REQU" + req.rawHeaders)
 
             console.log("REQU" + req.rawTrailers)
-           // val stream = fs.createWriteStream("test.png")
+            // val stream = fs.createWriteStream("test.png")
 
             val myAppCall =
                 MyNodeJsAppCall(environment.application, req, res)
 
             var buffer: Buffer = Buffer.alloc(10)
-            console.log(buffer.length)
             when (myAppCall.request.method) {
                 HttpMethod.Post, HttpMethod.Put -> {
 
                     req.on("data") { data ->
-                        console.log(data.toString())
                         buffer = Buffer.from(data)
                     }
                     req.on("end") { data ->
@@ -80,7 +78,7 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
                         routi.routeHandler(myAppCall)
                         when (myAppCall.request.method) {
                             HttpMethod.Post -> {
-                                if(buffer.length != 10){
+                                if (buffer.length != 10) {
                                     myAppCall.request.setData(buffer)
                                 }
                             }
@@ -112,9 +110,8 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
 fun ServerResponse.toServerResponse(myResponse: MyResponse) {
     this.statusCode = myResponse.statusCode.value
     myResponse.headers.allValues().forEach { s, list ->
-    this.setHeader(s, list.joinToString { it })
+        this.setHeader(s, list.joinToString { it })
     }
-
 
     when (val content = myResponse.content) {
         is TextContent -> {
@@ -125,15 +122,6 @@ fun ServerResponse.toServerResponse(myResponse: MyResponse) {
             val filePath = content.filePath
             val contentType = content.contentType.contentType + "/" + content.contentType.contentSubtype
 
-            this.statusCode = myResponse.statusCode.value
-           // this.setHeader(HttpHeaders.ContentType, contentType)
-           //  this.setHeader(HttpHeaders.ContentDisposition, ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName,"test.mp3").toString())
-            /**
-             * myResponse.headers.allValues().forEach { s, list ->
-            console.log("allValues"+s+ "    "+list)
-            this.setHeader(s, list.joinToString { it })
-            }
-             */
             fs.readFile(filePath) { error, data ->
 
                 this.end(data, "utf-8")

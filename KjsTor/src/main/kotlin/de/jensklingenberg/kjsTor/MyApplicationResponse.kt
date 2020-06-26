@@ -6,33 +6,18 @@ import io.ktor.response.ApplicationSendPipeline
 import io.ktor.response.ResponseHeaders
 import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
 import de.jensklingenberg.kjsTor.ktor.MyBaseApplicationResponse
+import io.ktor.response.ApplicationResponse
 
-interface MyApplicationResponse {
+interface MyApplicationResponse : ApplicationResponse {
 
-    /**
-     * [ApplicationCall] instance this ApplicationResponse is attached to
-     */
-    val call: MyApplicationCall
+
 
     /**
      * Set status for this response
      */
     fun setContent(statusCode: HttpStatusCode, header: ResponseHeader = DefaultHeader, content: OutgoingContent)
 
-    /**
-     * Currently set status code for this response, or null if none was set
-     */
-    fun status(): HttpStatusCode?
 
-    /**
-     * Pipeline for sending content
-     */
-    val pipeline: ApplicationSendPipeline
-
-    /**
-     * Headers for this response
-     */
-    val headers: ResponseHeaders
 }
 
 class MyResponse(myApplicationCall: MyApplicationCall) : MyBaseApplicationResponse(myApplicationCall) {
@@ -50,6 +35,10 @@ class MyResponse(myApplicationCall: MyApplicationCall) : MyBaseApplicationRespon
         return HttpStatusCode.OK //TODO
     }
 
+    override fun status(value: HttpStatusCode) {
+        TODO("Not yet implemented")
+    }
+
     override val headers: ResponseHeaders = object : ResponseHeaders() {
         override fun engineAppendHeader(name: String, value: String) {
             responseHeaders.add(ResponseHeader(name, value))
@@ -61,3 +50,5 @@ class MyResponse(myApplicationCall: MyApplicationCall) : MyBaseApplicationRespon
 
     }
 }
+
+fun MyApplicationResponse.header(name: String, value: String): Unit = headers.append(name,value)

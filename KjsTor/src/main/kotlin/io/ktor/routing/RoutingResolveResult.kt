@@ -42,7 +42,7 @@ sealed class RoutingResolveResult(val route: Route) {
  * @param routing root node for resolution to start at
  * @param call instance of [ApplicationCall] to use during resolution
  */
-class RoutingResolveContext(val routing: Route, val call: MyApplicationCall, private val tracers: List<(RoutingResolveTrace) -> Unit>) {
+class RoutingResolveContext(val routing: Route, val call: ApplicationCall, private val tracers: List<(RoutingResolveTrace) -> Unit>) {
 
     /**
      * List of path segments parsed out of a [call]

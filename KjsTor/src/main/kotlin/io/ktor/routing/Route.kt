@@ -7,12 +7,13 @@ import io.ktor.util.pipeline.PipelineContext
 import io.ktor.util.pipeline.PipelineInterceptor
 import de.jensklingenberg.kjsTor.MyNodeJsAppCall
 import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
-import io.ktor.application.MyApplicationCallPipeline
+import io.ktor.application.ApplicationCallPipeline
+
 import kotlinx.coroutines.CoroutineScope
 
 typealias dui = suspend MyNodeJsAppCall.() -> Unit
 
-open class Route(val parent: Route?, val selector: RouteSelector) : MyApplicationCallPipeline() {
+open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationCallPipeline() {
     /**
      * List of child routes for this node
      */
@@ -21,16 +22,13 @@ open class Route(val parent: Route?, val selector: RouteSelector) : MyApplicatio
     private val childList: MutableList<Route> = ArrayList()
     val bodies = ArrayList<dui>()
 
-    private var cachedPipeline: MyApplicationCallPipeline? = null
+    private var cachedPipeline: ApplicationCallPipeline? = null
 
     internal val handlers = ArrayList<PipelineInterceptor<Unit, MyApplicationCall>>()
     var routiList : MutableList<Routi> = mutableListOf()
     private val tracers = mutableListOf<(RoutingResolveTrace) -> Unit>()
 
-    suspend fun interceptor(context: PipelineContext<Unit, ApplicationCall>) {
-        //TODO
 
-    }
 
     suspend fun interceptor(context: CoroutineScope,call: MyApplicationCall) {
         //TODO
@@ -110,11 +108,11 @@ open class Route(val parent: Route?, val selector: RouteSelector) : MyApplicatio
         // If some child already cached its pipeline, it's ok to execute with outdated pipeline
         invalidateCachesRecursively()
     }
-    internal fun buildPipeline(): MyApplicationCallPipeline {
+    internal fun buildPipeline(): ApplicationCallPipeline {
         return cachedPipeline ?: run {
             var current: Route? = this
-            val pipeline = MyApplicationCallPipeline()
-            val routePipelines = mutableListOf<MyApplicationCallPipeline>()
+            val pipeline = ApplicationCallPipeline()
+            val routePipelines = mutableListOf<ApplicationCallPipeline>()
             while (current != null) {
                 routePipelines.add(current)
                 current = current.parent

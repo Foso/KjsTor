@@ -42,4 +42,6 @@ interface ApplicationResponse {
      * or does nothing. Exact behaviour is up to engine implementation.
      */
   //  fun push(builder: ResponsePushBuilder)
+
+    // Custom
 }

@@ -12,53 +12,18 @@ import io.ktor.request.ApplicationReceivePipeline
 import io.ktor.request.ApplicationRequest
 import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
 import de.jensklingenberg.kjsTor.ktor.MyBaseApplicationRequest
-
-
-interface MyApplicationRequest {
-    /**
-     * [ApplicationCall] instance this ApplicationRequest is attached to
-     */
-    val call: MyApplicationCall
-
-    /**
-     * Pipeline for receiving content
-     */
-    val pipeline: ApplicationReceivePipeline
-
-    /**
-     * Parameters provided in an URL
-     */
-    val queryParameters: Parameters
-
-    /**
-     * Headers for this request
-     */
-    val headers: Headers
-
-    /**
-     * Contains http request and connection details such as a host name used to connect, port, scheme and so on.
-     * No proxy headers could affect it. Use [ApplicationRequest.origin] if you need override headers support
-     */
-    val local: RequestConnectionPoint
-
-    /**
-     * Cookies for this request
-     */
-    // val cookies: RequestCookies
-
-    /**
-     * Request's body channel (for content only)
-     */
-    fun setData(buffer: Buffer)
-
-    fun receiveData(callback: (Buffer) -> Unit)
-}
+import io.ktor.utils.io.ByteReadChannel
 
 
 class MyRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: IncomingMessage) :
     MyBaseApplicationRequest(callNodeJs) {
     override val local: RequestConnectionPoint =
         NodeJsConnectionPoint(incomingMessage)
+
+    override fun receiveChannel(): ByteReadChannel {
+        TODO("Not yet implemented")
+    }
+
     var dataCallback: (Buffer) -> Unit={
         console.log("FUNCTION NOT SET")
     }

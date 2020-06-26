@@ -3,45 +3,25 @@ package de.jensklingenberg.kjsTor.ktor
 import Buffer
 import de.jensklingenberg.kjsTor.*
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.http.content.LocalFileContent
+import io.ktor.request.ApplicationRequest
+import io.ktor.response.ApplicationResponse
 import io.ktor.util.Attributes
 
 /**
  * Represents a single act of communication between client and server.
  */
-interface MyApplicationCall {
-    /**
-     * Application being called
-     */
-    val application: Application
+interface MyApplicationCall : ApplicationCall{
 
-    /**
-     * Client request
-     */
-    val request: MyApplicationRequest
-
-    /**
-     * Server response
-     */
-    val response: MyApplicationResponse
-
-    /**
-     * Attributes attached to this instance
-     */
-    val attributes: Attributes
-
-    /**
-     * Parameters associated with this call
-     */
-    val parameters: Parameters
 }
 
 
 fun MyApplicationCall.respond(status: HttpStatusCode, message: String) {
-    response.setContent(statusCode = status, content = TextContent(message))
+    (response as MyApplicationResponse).setContent(statusCode = status, content = TextContent(message))
 }
 
 /**
@@ -81,11 +61,11 @@ fun MyApplicationCall.respondFile(filePath: String, contentType: ContentType) {
 
 
 fun MyApplicationCall.respondFile(content: LocalFileContent) {
-    response.setContent(HttpStatusCode.OK, content = content)
+    (response as MyApplicationResponse).setContent(HttpStatusCode.OK, content = content)
 }
 
 fun MyApplicationCall.respondRedirect(message: String) {
-    response.setContent(HttpStatusCode.Found,
+    (response as MyApplicationResponse).setContent(HttpStatusCode.Found,
         ResponseHeader("Location", message), content = TextContent(
             message
         )

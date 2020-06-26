@@ -1,6 +1,5 @@
 package io.ktor.server.engine;
 
-import de.jensklingenberg.kjsTor.MyNodeJsAppCall
 import io.ktor.application.Application
 import io.ktor.application.Logger
 import io.ktor.server.EngineConnectorConfig
@@ -59,9 +58,6 @@ class ApplicationEngineEnvironmentReloading(
 
     }
 
-    override fun handle(myNodeJsAppCall: MyNodeJsAppCall): MyNodeJsAppCall {
-        return myNodeJsAppCall
-    }
     override fun stop() {
 
 

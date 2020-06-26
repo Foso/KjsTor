@@ -48,7 +48,7 @@ private fun StringBuilder.appendln(s: String) {
  * @param call instance of [ApplicationCall] for which this trace was created.
  * @param segments list of [String]s for each path segment supplied for the routing resolution.
  */
-class RoutingResolveTrace(val call: MyApplicationCall, val segments: List<String>) {
+class RoutingResolveTrace(val call: ApplicationCall, val segments: List<String>) {
     private val stack = Stack<RoutingResolveTraceEntry>()
     private var routing: RoutingResolveTraceEntry? = null
 

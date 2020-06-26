@@ -14,7 +14,6 @@ interface ApplicationEngineEnvironment : ApplicationEnvironment {
     override var route: Route?
     val modules: MutableList<Application.() -> Unit>
 
-    fun handle(myNodeJsAppCall: MyNodeJsAppCall) : MyNodeJsAppCall
 
 
     /**

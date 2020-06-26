@@ -4,11 +4,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.routing.*
 import io.ktor.util.Attributes
 import io.ktor.util.pipeline.*
-import de.jensklingenberg.kjsTor.MyNodeJsAppCall
 import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
 
 @ContextDsl
-fun Routing.get(path:String,  function:suspend MyApplicationCall.() -> Unit) : Route {
+fun MyRouting.get(path:String, function:suspend MyApplicationCall.() -> Unit) : Route {
     method(path,HttpMethod.Get,function)
   return route(path, HttpMethod.Get) { handle(function) }
 }
@@ -19,35 +18,35 @@ fun Routing.get(path:String,  function:suspend MyApplicationCall.() -> Unit) : R
  * Builds a route to match specified [method] and [path]
  */
 @ContextDsl
-fun Routing.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
+fun MyRouting.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
     val selector = HttpMethodRouteSelector(method)
     return createRouteFromPath(path).createChild(selector).apply(build)
 }
 
 @ContextDsl
-fun Routing.susget(path:String,  body: PipelineInterceptor<Unit, MyApplicationCall>) {
+fun MyRouting.susget(path:String, body: PipelineInterceptor<Unit, MyApplicationCall>) {
    // method(path,HttpMethod.Get,function)
     this.application.environment.route?.handle(body)
 }
 
 
 @ContextDsl
-fun Routing.post(path:String, function: suspend MyNodeJsAppCall.() -> Unit) {
+fun MyRouting.post(path:String, function: suspend MyApplicationCall.() -> Unit) {
     method(path,HttpMethod.Post,function)
 }
 
 @ContextDsl
-fun Routing.put(path:String, function: suspend MyNodeJsAppCall.() -> Unit) {
+fun MyRouting.put(path:String, function: suspend MyApplicationCall.() -> Unit) {
     method(path,HttpMethod.Put,function)
 }
 
 @ContextDsl
-fun Routing.delete(path:String,  function: suspend MyNodeJsAppCall.() -> Unit) {
+fun MyRouting.delete(path:String, function: suspend MyApplicationCall.() -> Unit) {
     method(path,HttpMethod.Delete,function)
 }
 
 
-fun Routing.method(path:String, method: HttpMethod, function: suspend MyNodeJsAppCall.() -> Unit): Route {
+fun MyRouting.method(path:String, method: HttpMethod, function: suspend MyApplicationCall.() -> Unit): Route {
     this.application.apply {
         if(environment.route==null){
             environment.route = Route(null, RootRouteSelector(""))
@@ -132,9 +131,9 @@ object PathSegmentSelectorBuilder {
 }
 
 @ContextDsl
-fun Application.myRouting(configuration: Routing.() -> Unit): Routing {
-    configuration.invoke(Routing(this))
-    return  featureOrNull(Routing)?.apply(configuration) ?: install(Routing, configuration)
+fun Application.myRouting(configuration: MyRouting.() -> Unit): MyRouting {
+    configuration.invoke(MyRouting(this))
+    return  featureOrNull(MyRouting)?.apply(configuration) ?: install(MyRouting, configuration)
 }
 
 fun <P : Pipeline<*, ApplicationCall>, B : Any, F : Any> P.install(
@@ -169,4 +168,4 @@ fun <P : Pipeline<*, ApplicationCall>, B : Any, F : Any> P.install(
 
 
 
-class Routi(val path: String, val method: HttpMethod, val routeHandler: suspend MyNodeJsAppCall.() -> Unit)
+class Routi(val path: String, val method: HttpMethod, val routeHandler: suspend MyApplicationCall.() -> Unit)

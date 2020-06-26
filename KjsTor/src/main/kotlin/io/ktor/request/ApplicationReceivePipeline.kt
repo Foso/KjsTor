@@ -17,7 +17,7 @@ class ApplicationReceiveRequest @KtorExperimentalAPI constructor(
     val value: Any,
     @KtorExperimentalAPI val reusableValue: Boolean = false
 ) {
-
+//TODO
 }
 
 /**

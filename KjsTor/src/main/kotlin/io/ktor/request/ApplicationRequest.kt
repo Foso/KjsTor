@@ -1,17 +1,17 @@
 package io.ktor.request
 
+import Buffer
 import io.ktor.application.ApplicationCall
 import io.ktor.http.Headers
 import io.ktor.http.Parameters
 import io.ktor.http.RequestConnectionPoint
 import io.ktor.utils.io.ByteReadChannel
-import de.jensklingenberg.kjsTor.MyApplicationRequest
+
 
 /**
  * Request's path without query string
  */
 fun ApplicationRequest.path(): String = local.uri.substringBefore('?')
-fun MyApplicationRequest.path(): String = local.uri.substringBefore('?')
 
 
 /**
@@ -53,4 +53,11 @@ interface ApplicationRequest {
      * Request's body channel (for content only)
      */
     fun receiveChannel(): ByteReadChannel
+
+    /**
+     * Request's body channel (for content only)
+     */
+    fun setData(buffer: Buffer)
+
+    fun receiveData(callback: (Buffer) -> Unit)
 }
