@@ -1,0 +1,10 @@
+            val stream = fs.createWriteStream("test.png")
+ req.on("data") { data ->
+                      //  buffer=  Buffer.concat(data)
+                        buffer=  Buffer.from(data)
+                        stream.write(data)
+                    }
+                    req.on("end") { data ->
+                    fs.writeFileSync("tt.png",buffer)
+                        stream.end()
+                    }

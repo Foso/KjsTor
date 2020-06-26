@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JSKtor-1.0-SNAPSHOT">
+    <output-path>$PROJECT_DIR$/JSKtor/build/libs</output-path>
+    <root id="archive" name="JSKtor-1.0-SNAPSHOT.jar" />
+  </artifact>
+</component>

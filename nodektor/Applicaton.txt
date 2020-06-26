@@ -1,0 +1,25 @@
+package de.jensklingenberg.tictactoe
+
+fun main() {
+    start()
+}
+
+fun start(){
+   // val fetch = require("./tictactoe.js")
+
+    val http = require("http")
+    val hostname = "127.0.0.1"
+    val port = 3000;
+
+    val server = createServer{req, res ->
+        res.statusCode = 200
+        res.setHeader("Content-Type", "text/plain")
+        res.end("Hello World\n")
+    }
+
+    server.listen(port, hostname, fun() {
+        println("Se rver running at http://${hostname}:${port}/")
+    })
+
+    console.log("HUHU")
+}

@@ -1,0 +1,15 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
+        gradlePluginPortal()
+
+        mavenCentral()
+
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+}
+include 'KjsTor'
+include 'nodektor'
+include 'ktorjs'
+

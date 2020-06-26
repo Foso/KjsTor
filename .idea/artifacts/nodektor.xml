@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="nodektor">
+    <output-path>$PROJECT_DIR$/nodektor/build/libs</output-path>
+    <root id="archive" name="nodektor.jar" />
+  </artifact>
+</component>
