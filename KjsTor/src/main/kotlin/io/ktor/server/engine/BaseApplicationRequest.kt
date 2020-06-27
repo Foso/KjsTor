@@ -9,7 +9,7 @@ import io.ktor.request.ApplicationRequest
  */
 abstract class BaseApplicationRequest(override val call: ApplicationCall) : ApplicationRequest {
     override val pipeline = ApplicationReceivePipeline().apply {
-        merge(call.application.receivePipeline)
+        //merge(call.application.receivePipeline)
     }
 }
 

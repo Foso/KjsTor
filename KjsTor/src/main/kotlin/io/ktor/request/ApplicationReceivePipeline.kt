@@ -1,10 +1,17 @@
 package io.ktor.request
 
 import io.ktor.application.ApplicationCall
+import io.ktor.application.log
+import io.ktor.http.Parameters
+import io.ktor.http.content.MultiPartData
+import io.ktor.util.AttributeKey
 import io.ktor.util.KtorExperimentalAPI
 import io.ktor.util.pipeline.Pipeline
 import io.ktor.util.pipeline.PipelinePhase
+import io.ktor.utils.io.ByteReadChannel
+import kotlin.reflect.KClass
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Represents a subject for [ApplicationReceivePipeline]
@@ -13,9 +20,7 @@ import kotlin.reflect.KType
  * @param reusableValue indicates whether the [value] instance can be reused. For example, a stream can't.
  */
 class ApplicationReceiveRequest @KtorExperimentalAPI constructor(
-    @KtorExperimentalAPI val typeInfo: KType,
-    val value: Any,
-    @KtorExperimentalAPI val reusableValue: Boolean = false
+
 ) {
 //TODO
 }
@@ -47,3 +52,4 @@ open class ApplicationReceivePipeline : Pipeline<ApplicationReceiveRequest, Appl
         val After = PipelinePhase("After")
     }
 }
+

@@ -7,7 +7,7 @@ package io.ktor.routing
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
+
 
 /**
  * Represents a result of routing resolution.
@@ -52,6 +52,7 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
     private val trace = if (tracers.isEmpty()) null else RoutingResolveTrace(call, segments)
 
     private fun parse(path: String): List<String> {
+        console.log("HIER IST PARSE"+path)
         if (path.isEmpty() || path == "/") return listOf()
         val length = path.length
         var beginSegment = 0
@@ -71,6 +72,9 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
             val segment = path.decodeURLPart(beginSegment, nextSegment)
             segments.add(segment)
             beginSegment = nextSegment + 1
+        }
+        segments.forEach {
+            console.log("SEGMENT "+it)
         }
         return segments
     }
@@ -96,7 +100,7 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
         }
     }
 
-    private fun resolve(entry: Route, segmentIndex: Int): RoutingResolveResult {
+    fun resolve(entry: Route, segmentIndex: Int): RoutingResolveResult {
         trace?.begin(entry, segmentIndex)
 
         // last failed entry for diagnostics
@@ -108,9 +112,12 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
 
         // iterate using indices to avoid creating iterator
         for (childIndex in 0..entry.children.lastIndex) {
+            console.log("CHILDREN"+entry.children.size)
+
             val child = entry.children[childIndex]
             val selectorResult = child.selector.evaluate(this, segmentIndex)
             if (!selectorResult.succeeded) {
+                console.log("Selector didn't match"+selectorResult)
                 trace?.skip(child, segmentIndex, RoutingResolveResult.Failure(child, "Selector didn't match"))
                 continue // selector didn't match, skip entire subtree
             }
@@ -124,6 +131,7 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
 
             if (immediateSelectQuality == bestQuality) {
                 // ambiguity, compare immediate child quality
+                console.log("IMMI")
                 if (bestChild!!.selector.quality >= child.selector.quality) {
                     trace?.skip(child, segmentIndex, RoutingResolveResult.Failure(child, "Lost in ambiguity tie"))
                     continue
@@ -133,6 +141,8 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
             val subtreeResult = resolve(child, segmentIndex + selectorResult.segmentIncrement)
             when (subtreeResult) {
                 is RoutingResolveResult.Failure -> {
+                    console.log("RoutingResolveResult.Failure "+subtreeResult.reason)
+
                     // subtree didn't match, skip to next child, remember first failed entry
                     if (failEntry == null) {
                         failEntry = subtreeResult.route
@@ -142,10 +152,12 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
                     bestChild = child
                     bestQuality = immediateSelectQuality
                     bestResult = if (selectorResult.parameters.isEmpty()) {
+                        console.log("Empty")
                         // do not allocate new RoutingResolveResult if it will be the same as subtreeResult
                         // TODO: Evaluate if we can make RoutingResolveResult mutable altogether and avoid allocations
                         subtreeResult
                     } else {
+                        console.log("NO MEP")
                         val combinedValues = selectorResult.parameters + subtreeResult.parameters
                         RoutingResolveResult.Success(subtreeResult.route, combinedValues)
                     }
@@ -153,7 +165,7 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
             }
         }
 
-        val result = if (segmentIndex == segments.size && entry.handlers.isNotEmpty()) {
+        val result = if (segmentIndex == segments.size) {
             if (bestResult != null && bestQuality > RouteSelectorEvaluation.qualityMissing) {
                 // child match is better than missing optional parameter, so choose it
                 bestResult
@@ -162,10 +174,12 @@ class RoutingResolveContext(val routing: Route, val call: ApplicationCall, priva
                 RoutingResolveResult.Success(entry, Parameters.Empty)
             }
         } else {
+            console.log("HIER LANG")
             if (bestResult != null) {
                 // child matched
                 bestResult
             } else {
+                console.log("WEIP AUCH NCIHT")
                 // nothing more to match and no handler, or there are more segments and no matched child
                 val reason = if (segmentIndex == segments.size) "Segments exhausted but no handlers found" else "Not all segments matched"
                 RoutingResolveResult.Failure(failEntry ?: entry, reason)

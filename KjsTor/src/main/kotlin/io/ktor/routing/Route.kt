@@ -1,17 +1,15 @@
 package io.ktor.routing
 
-import Routi
-import io.ktor.application.ApplicationCall
-import io.ktor.http.Parameters
-import io.ktor.util.pipeline.PipelineContext
-import io.ktor.util.pipeline.PipelineInterceptor
 import de.jensklingenberg.kjsTor.MyNodeJsAppCall
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
+import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationCallPipeline
+import io.ktor.http.HttpMethod
+import io.ktor.util.pipeline.PipelineInterceptor
 
-import kotlinx.coroutines.CoroutineScope
+typealias dui = ApplicationCall.() -> Unit
 
-typealias dui = suspend MyNodeJsAppCall.() -> Unit
+
+class Routi(val path: String, val method: HttpMethod, val routeHandler: ApplicationCall.() -> Unit)
 
 open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationCallPipeline() {
     /**
@@ -24,34 +22,21 @@ open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationC
 
     private var cachedPipeline: ApplicationCallPipeline? = null
 
-    internal val handlers = ArrayList<PipelineInterceptor<Unit, MyApplicationCall>>()
+    internal val handlers = ArrayList<PipelineInterceptor<Unit, ApplicationCall>>()
     var routiList : MutableList<Routi> = mutableListOf()
-    private val tracers = mutableListOf<(RoutingResolveTrace) -> Unit>()
 
 
+    var path =""
 
-    suspend fun interceptor(context: CoroutineScope,call: MyApplicationCall) {
-        //TODO
-        val resolveContext = RoutingResolveContext(this, call, tracers)
-        val resolveResult = resolveContext.resolve()
-        if (resolveResult is RoutingResolveResult.Success) {
-            console.log("SUCCESS")
-            //executeResult(context, resolveResult.route, resolveResult.parameters)
-        }else {
-            console.log(resolveResult)
-            //executeResult(context, resolveResult.route, resolveResult.parameters)
-        }
-    }
-
-    private suspend fun executeResult(
-        context: PipelineContext<Unit, ApplicationCall>,
-        route: Route,
-        parameters: Parameters
-    ) {
-
+    fun addPath(path:String){
+        this.path= path
     }
     fun myAddChild(route: Routi){
-        routiList.add(route)
+       if( routiList.none() { it.path == route.path }){
+           console.log("Myaddchild")
+           routiList.add(route)
+       }
+
     }
 
     /**
@@ -70,14 +55,14 @@ open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationC
     /**
      * Installs a handler into this route which will be called when the route is selected for a call
      */
-    fun handle(handler: PipelineInterceptor<Unit, MyApplicationCall>) {
+    fun handle(handler: PipelineInterceptor<Unit, ApplicationCall>) {
         handlers.add(handler)
 
         // Adding a handler invalidates only pipeline for this entry
         cachedPipeline = null
     }
 
-    fun handle(handler : suspend MyNodeJsAppCall.() -> Unit) {
+    fun handle(handler : ApplicationCall.() -> Unit) {
         bodies.add(handler)
     }
 
@@ -109,6 +94,7 @@ open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationC
         invalidateCachesRecursively()
     }
     internal fun buildPipeline(): ApplicationCallPipeline {
+        console.log("BuildPipeline")
         return cachedPipeline ?: run {
             var current: Route? = this
             val pipeline = ApplicationCallPipeline()
@@ -127,7 +113,7 @@ open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationC
 
             val handlers = handlers
             for (index in 0..handlers.lastIndex) {
-               //TODO pipeline.intercept(Call, handlers[index])
+                pipeline.intercept(Call, handlers[index])
             }
             cachedPipeline = pipeline
             pipeline

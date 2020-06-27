@@ -1,7 +1,7 @@
 package io.ktor.application;
 
 
-import Routi
+
 import io.ktor.routing.Route
 import kotlin.coroutines.CoroutineContext
 
@@ -33,7 +33,7 @@ interface ApplicationEnvironment {
     /**
      * Provides events on Application lifecycle
      */
-   // val monitor: ApplicationEvents
+    val monitor: ApplicationEvents
 
     /**
      * Application's root path (prefix, context path in servlet container).

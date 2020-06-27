@@ -1,28 +1,25 @@
 package de.jensklingenberg.kjsTor
 
+
 import Buffer
 import de.jensklingenberg.mapEntriesOf
 import http.IncomingMessage
-import io.ktor.application.ApplicationCall
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.Parameters
 import io.ktor.http.RequestConnectionPoint
-import io.ktor.request.ApplicationReceivePipeline
-import io.ktor.request.ApplicationRequest
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
-import de.jensklingenberg.kjsTor.ktor.MyBaseApplicationRequest
+import io.ktor.server.engine.BaseApplicationRequest
+import io.ktor.utils.io.ByteChannel
 import io.ktor.utils.io.ByteReadChannel
 
 
-class MyRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: IncomingMessage) :
-    MyBaseApplicationRequest(callNodeJs) {
+class NodeJsRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: IncomingMessage,val contentByteChannel: ByteChannel = ByteChannel()) :
+    BaseApplicationRequest(callNodeJs) {
     override val local: RequestConnectionPoint =
         NodeJsConnectionPoint(incomingMessage)
 
-    override fun receiveChannel(): ByteReadChannel {
-        TODO("Not yet implemented")
-    }
+    override fun receiveChannel(): ByteReadChannel = contentByteChannel
+
 
     var dataCallback: (Buffer) -> Unit={
         console.log("FUNCTION NOT SET")
@@ -68,17 +65,17 @@ class MyRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: In
 
 class NodeJsConnectionPoint(val incomingMessage: IncomingMessage) : RequestConnectionPoint {
     override val host: String
-        get() = TODO("Not yet implemented")
+        get() = "NICHT "
     override val method: HttpMethod
         get() = HttpMethod.parse(incomingMessage.method)
     override val port: Int
-        get() = TODO("Not yet implemented")
+        get() = -1
     override val remoteHost: String
-        get() = TODO("Not yet implemented")
+        get() = "HERE"
     override val scheme: String
-        get() = TODO("Not yet implemented")
+        get() = "HERE"
     override val uri: String
-        get() = incomingMessage.url
+        get() = "/"+incomingMessage.url
     override val version: String
         get() = incomingMessage.httpVersion
 

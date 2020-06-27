@@ -28,12 +28,16 @@ class Routing(val application: Application) :
     }
 
     suspend fun interceptor(context: PipelineContext<Unit, ApplicationCall>) {
+        console.log("INTERCEPT")
         val resolveContext = RoutingResolveContext(this, context.call, tracers)
         val resolveResult = resolveContext.resolve()
         if (resolveResult is RoutingResolveResult.Success) {
             executeResult(context, resolveResult.route, resolveResult.parameters)
         }
     }
+
+
+
 
     private suspend fun executeResult(
         context: PipelineContext<Unit, ApplicationCall>,
@@ -52,19 +56,22 @@ class Routing(val application: Application) :
         ) { ApplicationSendPipeline() }
 
         val routingCall = RoutingApplicationCall(context.call, route, receivePipeline, responsePipeline, parameters)
-       //TODO application.environment.monitor.raise(RoutingCallStarted, routingCall)
+       application.environment.monitor.raise(RoutingCallStarted, routingCall)
         try {
             routingCallPipeline.execute(routingCall)
         } finally {
-            //TODO  application.environment.monitor.raise(RoutingCallFinished, routingCall)
+          application.environment.monitor.raise(RoutingCallFinished, routingCall)
         }
     }
+
+
     @OptIn(InternalAPI::class)
     private inline fun <Subject : Any, Context : Any, P : Pipeline<Subject, Context>> merge(
         first: P,
         second: P,
         build: () -> P
     ): P {
+console.log("MERGE")
         if (first.isEmpty) {
             return second
         }
@@ -86,21 +93,26 @@ class Routing(val application: Application) :
         /**
          * Event definition for when a routing-based call processing starts
          */
+        @KtorExperimentalAPI
         val RoutingCallStarted = EventDefinition<RoutingApplicationCall>()
         /**
          * Event definition for when a routing-based call processing finished
          */
+        @KtorExperimentalAPI
         val RoutingCallFinished = EventDefinition<RoutingApplicationCall>()
 
         override val key: AttributeKey<Routing> = AttributeKey("Routing")
 
         override fun install(pipeline: Application, configure: Routing.() -> Unit): Routing {
+            console.log("INSTALL")
             val routing = Routing(pipeline).apply(configure)
             pipeline.intercept(ApplicationCallPipeline.Call) { routing.interceptor(this) }
             return routing
         }
     }
 }
+
+
 
 /**
  * Gets an [Application] for this [Route] by scanning the hierarchy to the root

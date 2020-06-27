@@ -36,6 +36,7 @@ val featureRegistryKey = AttributeKey<Attributes>("ApplicationFeatureRegistry")
  * @param feature application feature to lookup
  * @return an instance of feature
  */
+@ExperimentalCoroutinesApi
 fun <A : Pipeline<*, ApplicationCall>, B : Any, F : Any> A.feature(feature: ApplicationFeature<A, B, F>): F {
     return attributes[featureRegistryKey].getOrNull(feature.key)
         ?: throw MissingApplicationFeatureException(feature.key)
@@ -56,6 +57,9 @@ fun <P : Pipeline<*, ApplicationCall>, B : Any, F : Any> P.install(
     configure: B.() -> Unit = {}
 ): F {
     val registry = attributes.computeIfAbsent(featureRegistryKey) { Attributes(true) }
+    attributes.allKeys.forEach {
+        console.log("ATTR"+it.name)
+    }
     val installedFeature = registry.getOrNull(feature.key)
     when (installedFeature) {
         null -> {

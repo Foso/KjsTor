@@ -12,4 +12,5 @@ pluginManagement {
 include 'KjsTor'
 include 'nodektor'
 include 'ktorjs'
+include 'shared'
 

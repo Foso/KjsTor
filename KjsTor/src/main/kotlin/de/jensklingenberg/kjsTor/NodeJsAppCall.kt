@@ -4,16 +4,19 @@ import http.IncomingMessage
 import http.ServerResponse
 import io.ktor.application.Application
 import io.ktor.http.*
-import de.jensklingenberg.kjsTor.ktor.MyBaseApplicationCall
+import io.ktor.server.engine.BaseApplicationCall
 
-class MyNodeJsAppCall(application: Application, incomingMessage: IncomingMessage, res: ServerResponse) : MyBaseApplicationCall(application) {
+
+class MyNodeJsAppCall(application: Application, incomingMessage: IncomingMessage, res: ServerResponse) : BaseApplicationCall(application) {
 
     val url = incomingMessage.url
     val method = incomingMessage.method
-    override val response: MyResponse =
-        MyResponse(this)
-    override val request = MyRequest(this, incomingMessage)
-
+    override val response: NodeJsResponse =
+        NodeJsResponse(this)
+    override val request = NodeJsRequest(this, incomingMessage)
+    init {
+        putResponseAttribute()
+    }
 }
 
 class EmptyTextContent : TextContent("")

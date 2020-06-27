@@ -4,13 +4,13 @@
 
 package io.ktor.response
 
+import io.ktor.application.ApplicationCall
 import io.ktor.util.pipeline.*
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
 
 /**
  * Server response send pipeline
  */
-open class ApplicationSendPipeline : Pipeline<Any, MyApplicationCall>(Before, Transform, Render, ContentEncoding, TransferEncoding, After, Engine) {
+open class ApplicationSendPipeline : Pipeline<Any, ApplicationCall>(Before, Transform, Render, ContentEncoding, TransferEncoding, After, Engine) {
     /**
      * Send pipeline phases
      */
@@ -55,5 +55,20 @@ open class ApplicationSendPipeline : Pipeline<Any, MyApplicationCall>(Before, Tr
          */
 
         val Engine = PipelinePhase("Engine")
+    }
+
+    fun myExecute(){
+
+    }
+
+
+    fun myintercept(phase: PipelinePhase, block: PipelineInterceptor<Any, ApplicationCall>) {
+        console.log("myintercept")
+        intercept(phase,block)
+    }
+
+    override fun afterIntercepted() {
+
+        super.afterIntercepted()
     }
 }

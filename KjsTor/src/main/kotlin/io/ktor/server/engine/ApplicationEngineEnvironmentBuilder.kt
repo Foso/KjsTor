@@ -1,7 +1,6 @@
 package io.ktor.server.engine;
 
-import io.ktor.application.Application
-import io.ktor.application.Logger
+import io.ktor.application.*
 import io.ktor.server.EngineConnectorConfig
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -42,7 +41,7 @@ class ApplicationEngineEnvironmentBuilder {
      */
     fun build(builder: ApplicationEngineEnvironmentBuilder.() -> Unit): ApplicationEngineEnvironment {
         builder(this)
-        return ApplicationEngineEnvironmentReloading(connectors, parentCoroutineContext, rootPath,modules)
+        return ApplicationEngineEnvironmentReloading(connectors, parentCoroutineContext, rootPath,modules,watchPaths)
     }
 }
 
@@ -51,12 +50,46 @@ class ApplicationEngineEnvironmentReloading(
     override val connectors: List<EngineConnectorConfig>,
     override val parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
     override val rootPath: String = "",
-    override val modules: MutableList<Application.() -> Unit>
+    override val modules: MutableList<Application.() -> Unit>,
+    watchPaths: List<String>
 ) : ApplicationEngineEnvironment {
     override var route: io.ktor.routing.Route?=null
     override fun start() {
-
+        instantiateAndConfigureApplication()
     }
+    private val watchPatterns: List<String> = emptyList()
+        //(config.propertyOrNull("ktor.deployment.watch")?.getList() ?: listOf()) + watchPaths
+    private fun instantiateAndConfigureApplication(): Application {
+        val application = Application(this)
+        safeRiseEvent(ApplicationStarting, application)
+            console.log("START")
+            /**
+             * avoidingDoubleStartup {
+            moduleFunctionNames?.forEach { fqName ->
+            avoidingDoubleStartupFor(fqName) {
+            executeModuleFunction(classLoader, fqName, application)
+            }
+            }
+            }
+             */
+
+        if (watchPatterns.isEmpty()) {
+            modules.forEach { it(application) }
+        }
+
+        safeRiseEvent(ApplicationStarted, application)
+        return application
+    }
+
+    private fun safeRiseEvent(event: EventDefinition<Application>, application: Application) {
+        try {
+            monitor.raise(event, application)
+        } catch (e: Throwable) {
+            //log.error("One or more of the handlers thrown an exception", e)
+        }
+    }
+
+    override val monitor = ApplicationEvents()
 
     override fun stop() {
 

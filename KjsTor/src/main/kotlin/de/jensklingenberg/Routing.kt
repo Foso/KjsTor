@@ -1,52 +1,44 @@
-import io.ktor.routing.PathSegmentOptionalParameterRouteSelector
-import io.ktor.application.*
+import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpMethod
 import io.ktor.routing.*
-import io.ktor.util.Attributes
-import io.ktor.util.pipeline.*
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
+import io.ktor.util.pipeline.ContextDsl
+
 
 @ContextDsl
-fun MyRouting.get(path:String, function:suspend MyApplicationCall.() -> Unit) : Route {
+fun Routing.get(path:String, function: ApplicationCall.() -> Unit) : Route {
     method(path,HttpMethod.Get,function)
-  return route(path, HttpMethod.Get) { handle(function) }
+    return route(path, HttpMethod.Get) { handle(function) }
 }
-
 
 
 /**
  * Builds a route to match specified [method] and [path]
  */
 @ContextDsl
-fun MyRouting.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
+fun Route.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
     val selector = HttpMethodRouteSelector(method)
     return createRouteFromPath(path).createChild(selector).apply(build)
 }
 
-@ContextDsl
-fun MyRouting.susget(path:String, body: PipelineInterceptor<Unit, MyApplicationCall>) {
-   // method(path,HttpMethod.Get,function)
-    this.application.environment.route?.handle(body)
-}
 
 
 @ContextDsl
-fun MyRouting.post(path:String, function: suspend MyApplicationCall.() -> Unit) {
+fun Routing.post(path:String, function: ApplicationCall.() -> Unit) {
     method(path,HttpMethod.Post,function)
 }
 
 @ContextDsl
-fun MyRouting.put(path:String, function: suspend MyApplicationCall.() -> Unit) {
+fun Routing.put(path:String, function: ApplicationCall.() -> Unit) {
     method(path,HttpMethod.Put,function)
 }
 
 @ContextDsl
-fun MyRouting.delete(path:String, function: suspend MyApplicationCall.() -> Unit) {
+fun Routing.delete(path:String, function: ApplicationCall.() -> Unit) {
     method(path,HttpMethod.Delete,function)
 }
 
 
-fun MyRouting.method(path:String, method: HttpMethod, function: suspend MyApplicationCall.() -> Unit): Route {
+fun Route.method(path:String, method: HttpMethod, function: ApplicationCall.() -> Unit): Route {
     this.application.apply {
         if(environment.route==null){
             environment.route = Route(null, RootRouteSelector(""))
@@ -130,42 +122,7 @@ object PathSegmentSelectorBuilder {
     }
 }
 
-@ContextDsl
-fun Application.myRouting(configuration: MyRouting.() -> Unit): MyRouting {
-    configuration.invoke(MyRouting(this))
-    return  featureOrNull(MyRouting)?.apply(configuration) ?: install(MyRouting, configuration)
-}
-
-fun <P : Pipeline<*, ApplicationCall>, B : Any, F : Any> P.install(
-    feature: ApplicationFeature<P, B, F>,
-    configure: B.() -> Unit = {}
-): F {
-    val registry = attributes.computeIfAbsent(featureRegistryKey) { Attributes(true) }
-    val installedFeature = registry.getOrNull(feature.key)
-    when (installedFeature) {
-        null -> {
-            try {
-                @Suppress("DEPRECATION_ERROR")
-                val installed = feature.install(this, configure)
-                registry.put(feature.key, installed)
-                //environment.log.trace("`${feature.name}` feature was installed successfully.")
-                return installed
-            } catch (t: Throwable) {
-                //environment.log.error("`${feature.name}` feature failed to install.", t)
-                throw t
-            }
-        }
-        feature -> {
-            //environment.log.warning("`${feature.name}` feature is already installed")
-            return installedFeature
-        }
-        else -> {
-            throw DuplicateApplicationFeatureException("Conflicting application feature is already installed with the same key as `${feature.key.name}`")
-        }
-    }
-}
 
 
 
 
-class Routi(val path: String, val method: HttpMethod, val routeHandler: suspend MyApplicationCall.() -> Unit)

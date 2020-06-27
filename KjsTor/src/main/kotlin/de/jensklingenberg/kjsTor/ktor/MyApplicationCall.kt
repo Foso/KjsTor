@@ -15,13 +15,13 @@ import io.ktor.util.Attributes
 /**
  * Represents a single act of communication between client and server.
  */
-interface MyApplicationCall : ApplicationCall{
-
-}
 
 
-fun MyApplicationCall.respond(status: HttpStatusCode, message: String) {
-    (response as MyApplicationResponse).setContent(statusCode = status, content = TextContent(message))
+
+inline fun ApplicationCall.respond(status: HttpStatusCode, message: String) {
+   // this.response.pipeline.execute(this,message)
+    (response as MyApplicationResponse).setContent(HttpStatusCode.OK, content = TextContent(message))
+
 }
 
 /**
@@ -29,7 +29,7 @@ fun MyApplicationCall.respond(status: HttpStatusCode, message: String) {
  * @param contentType is an optional [ContentType], default is [ContentType.Text.Plain]
  * @param status is an optional [HttpStatusCode], default is [HttpStatusCode.OK]
  */
-fun MyApplicationCall.respondText(
+fun ApplicationCall.respondText(
     text: String,
     contentType: ContentType? = null,
     status: HttpStatusCode? = null,
@@ -38,17 +38,9 @@ fun MyApplicationCall.respondText(
     respond(HttpStatusCode.OK, text)
 }
 
-suspend inline fun MyApplicationCall.susrespondText(
-    text: String,
-    contentType: ContentType? = null,
-    status: HttpStatusCode? = null,
-    configure: OutgoingContent.() -> Unit = {}
-) {
-    console.log("Suspend")
-    //respond(HttpStatusCode.OK,text)
-}
 
-fun MyApplicationCall.respondFile(filePath: String, contentType: ContentType) {
+
+fun ApplicationCall.respondFile(filePath: String, contentType: ContentType) {
    val message = LocalFileContent(
        filePath,
        contentType
@@ -60,11 +52,11 @@ fun MyApplicationCall.respondFile(filePath: String, contentType: ContentType) {
 
 
 
-fun MyApplicationCall.respondFile(content: LocalFileContent) {
+fun ApplicationCall.respondFile(content: LocalFileContent) {
     (response as MyApplicationResponse).setContent(HttpStatusCode.OK, content = content)
 }
 
-fun MyApplicationCall.respondRedirect(message: String) {
+fun ApplicationCall.respondRedirect(message: String) {
     (response as MyApplicationResponse).setContent(HttpStatusCode.Found,
         ResponseHeader("Location", message), content = TextContent(
             message
@@ -72,9 +64,9 @@ fun MyApplicationCall.respondRedirect(message: String) {
     )
 }
 
-val MyApplicationCall.appCall: MyApplicationCall get() = this
+val ApplicationCall.appCall: ApplicationCall get() = this
 
 
-fun MyApplicationCall.receiveData(function: (Buffer) -> Unit) {
+fun ApplicationCall.receiveData(function: (Buffer) -> Unit) {
     this.request.receiveData(function)
 }

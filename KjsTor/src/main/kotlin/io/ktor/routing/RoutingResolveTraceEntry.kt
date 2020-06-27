@@ -5,7 +5,7 @@
 package io.ktor.routing
 
 import io.ktor.application.*
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
+
 
 /**
  * Represents a single entry in the [RoutingResolveTrace].

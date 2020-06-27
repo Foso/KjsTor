@@ -1,5 +1,7 @@
 package io.ktor.server.engine
 
+import io.ktor.application.Application
+
 /**
  * Engine which runs an application
  */
@@ -39,7 +41,7 @@ interface ApplicationEngine {
     /**
      * Currently running application instance
      */
-    // val application: Application get() = environment.application
+     val application: Application get() = environment.application
 
     /**
      * Starts this [ApplicationEngine]

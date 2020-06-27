@@ -4,13 +4,14 @@
 
 package io.ktor.routing
 
+import createRouteFromPath
 import io.ktor.application.*
 import io.ktor.http.HttpMethod
 import io.ktor.http.decodeURLPart
 import io.ktor.request.ApplicationRequest
 import io.ktor.util.AttributeKey
 
-import de.jensklingenberg.kjsTor.ktor.MyApplicationCall
+
 import io.ktor.http.Parameters
 import io.ktor.request.ApplicationReceivePipeline
 import io.ktor.response.ApplicationSendPipeline
@@ -61,102 +62,8 @@ class RootRouteSelector(rootPath: String) :RouteSelector(RouteSelectorEvaluation
 
 inline val PipelineContext<*, ApplicationCall>.call: ApplicationCall get() = context
 
-/**
- * Root routing node for an [Application]
- * @param application is an instance of [Application] for this routing
- */
-class MyRouting(val application: Application):  Route(parent = null, selector = RootRouteSelector(application.environment.rootPath) ) {
-
-    private suspend fun executeResult(
-        context: PipelineContext<Unit, ApplicationCall>,
-        route: Route,
-        parameters: Parameters
-    ) {
-        val routingCallPipeline = route.buildPipeline()
-        val receivePipeline = merge(
-            context.call.request.pipeline,
-            routingCallPipeline.receivePipeline
-        ) { ApplicationReceivePipeline() }
-
-        val responsePipeline = merge(
-            context.call.response.pipeline,
-            routingCallPipeline.sendPipeline
-        ) { ApplicationSendPipeline() }
-
-        val routingCall = RoutingApplicationCall(context.call, route, receivePipeline, responsePipeline, parameters)
-       //TODO application.environment.monitor.raise(RoutingCallStarted, routingCall)
-        try {
-            //TODO  routingCallPipeline.execute(routingCall)
-        } finally {
-            //TODO application.environment.monitor.raise(RoutingCallFinished, routingCall)
-        }
-    }
-
-    @OptIn(InternalAPI::class)
-    private inline fun <Subject : Any, Context : Any, P : Pipeline<Subject, Context>> merge(
-        first: P,
-        second: P,
-        build: () -> P
-    ): P {
-        if (first.isEmpty) {
-            return second
-        }
-        if (second.isEmpty) {
-            return first
-        }
-        return build().apply {
-            merge(first)
-            merge(second)
-        }
-    }
-        /**
-     *
-     * Installable feature for [MyRouting]
-     */
-    @Suppress("PublicApiImplicitType")
-    companion object Feature : ApplicationFeature<Application, MyRouting, MyRouting> {
-
-        /**
-         * Event definition for when a routing-based call processing starts
-         */
-        val RoutingCallStarted = EventDefinition<RoutingApplicationCall>()
-        /**
-         * Event definition for when a routing-based call processing finished
-         */
-        val RoutingCallFinished = EventDefinition<RoutingApplicationCall>()
-
-        override val key: AttributeKey<MyRouting> = AttributeKey("Routing")
-
-        override fun install(pipeline: Application, configure: MyRouting.() -> Unit): MyRouting {
-            val routing = MyRouting(pipeline).apply(configure)
-            pipeline.intercept(ApplicationCallPipeline.Call) { routing.interceptor(this) }
-            return routing
-        }
 
 
-        }
-
-}
-
-/**
- * Gets or installs a [MyRouting] feature for the this [Application] and runs a [configuration] script on it
- */
-@ContextDsl
-fun Application.routing(configuration: MyRouting.() -> Unit): MyRouting {
-
-    return MyRouting(this)
-}
-
-
-
-
-/**
- * Builds a route to match `GET` requests with specified [path]
- */
-@ContextDsl
-fun Route.get(path: String, body: PipelineInterceptor<Unit, MyApplicationCall>): Route {
-    return route(path, HttpMethod.Get) { handle(body) }
-}
 
 /**
  * Builds a route to match specified [method] and [path]
@@ -164,22 +71,12 @@ fun Route.get(path: String, body: PipelineInterceptor<Unit, MyApplicationCall>):
 @ContextDsl
 fun Route.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
     val selector = HttpMethodRouteSelector(method)
-    return createRouteFromPath(path).createChild(selector).apply(build)
+    val route = createRouteFromPath(path).createChild(selector).apply(build)
+
+    return route
 }
 
-/**
- * Create a routing entry for specified path
- */
-fun Route.createRouteFromPath(path: String): Route {
-    val parts = RoutingPath.parse(path).parts
-    var current: Route = this
-    for ((value, kind) in parts) {
 
-        // there may already be entry with same selector, so join them
-        current = current.createChild(selector)
-    }
-    return current
-}
 
 /**
  * Represents a parsed routing path. Consist of number of segments [parts]
