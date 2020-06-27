@@ -9,8 +9,8 @@ pluginManagement {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
 }
-include 'KjsTor'
-include 'nodektor'
-include 'ktorjs'
+include 'Example'
+include 'nodejswrapper'
+include 'kjstor'
 include 'shared'
 

@@ -1,0 +1,38 @@
+plugins {
+    id 'org.jetbrains.kotlin.js'
+}
+
+
+kotlin {
+    target {
+        useCommonJs()
+        nodejs(){
+            configure([compilations.main]) {
+                tasks.getByName(compileKotlinTaskName).kotlinOptions {
+                    // outputFile = "${project.buildDir.path}/js/${project.name}.js"
+                    moduleKind = "commonjs"
+                    main = "call"
+                }}
+
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+    api project(":nodejswrapper")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-js:1.3.72"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.7'
+    implementation 'io.ktor:ktor-utils-js:1.3.2'
+    implementation 'io.ktor:ktor-http-js:1.3.2'
+    implementation 'io.ktor:ktor-http-cio-js:1.3.2'
+    implementation 'io.ktor:ktor-io-js:1.3.2'
+
+}
+
+
+// workaround for https://youtrack.jetbrains.com/issue/KT-27170
+configurations {
+    compileClasspath
+}
+
