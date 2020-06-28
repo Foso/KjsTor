@@ -1,4 +1,4 @@
-package de.jensklingenberg.kjsTor
+package de.jensklingenberg.kjsTor.node
 
 import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpHeaders

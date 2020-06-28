@@ -22,6 +22,9 @@ dependencies {
     implementation 'io.ktor:ktor-http-cio-js:1.3.2'
     implementation 'io.ktor:ktor-io-js:1.3.2'
    // implementation "io.ktor:ktor-client-js:1.3.2"
+    implementation(npm('express', ''))
+    implementation(npm('express-ws', ''))
+
 }
 
 

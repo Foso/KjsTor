@@ -1,4 +1,4 @@
-package io.ktor.ext
+package de.jensklingenberg.kjstor
 
 import Buffer
 
@@ -11,23 +11,14 @@ import io.ktor.http.content.TextContent
 import io.ktor.response.MyApplicationResponse
 import io.ktor.response.ResponseHeader
 
-/**
- * Represents a single act of communication between client and server.
- */
 
-
-
-inline fun ApplicationCall.respond(status: HttpStatusCode, message: String) {
+fun ApplicationCall.respond(status: HttpStatusCode, message: String) {
    // this.response.pipeline.execute(this,message)
     (response as MyApplicationResponse).setContent(HttpStatusCode.OK, content = TextContent(message))
 
 }
 
-/**
- * Responds to a client with a plain text response, using specified [text]
- * @param contentType is an optional [ContentType], default is [ContentType.Text.Plain]
- * @param status is an optional [HttpStatusCode], default is [HttpStatusCode.OK]
- */
+
 fun ApplicationCall.respondText(
     text: String,
     contentType: ContentType? = null,

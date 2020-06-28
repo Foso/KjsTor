@@ -1,4 +1,4 @@
-package de.jensklingenberg.kjsTor
+package de.jensklingenberg.kjsTor.node
 
 
 import Buffer
@@ -13,7 +13,7 @@ import io.ktor.utils.io.ByteChannel
 import io.ktor.utils.io.ByteReadChannel
 
 
-class NodeJsRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: IncomingMessage,val contentByteChannel: ByteChannel = ByteChannel()) :
+class NodeJsRequest(private val callNodeJs: MyNodeJsAppCall, val incomingMessage: IncomingMessage, val contentByteChannel: ByteChannel = ByteChannel()) :
     BaseApplicationRequest(callNodeJs) {
     override val local: RequestConnectionPoint =
         NodeJsConnectionPoint(incomingMessage)

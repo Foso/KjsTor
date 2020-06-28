@@ -10,13 +10,8 @@ import io.ktor.application.*
 import io.ktor.http.HttpMethod
 import io.ktor.http.decodeURLPart
 import io.ktor.request.ApplicationRequest
-import io.ktor.util.AttributeKey
 
 
-import io.ktor.http.Parameters
-import io.ktor.request.ApplicationReceivePipeline
-import io.ktor.response.ApplicationSendPipeline
-import io.ktor.util.InternalAPI
 import io.ktor.util.pipeline.*
 
 /**
@@ -61,7 +56,6 @@ class RootRouteSelector(rootPath: String) :RouteSelector(RouteSelectorEvaluation
     override fun toString(): String = parts.joinToString("/")
 }
 
-inline val PipelineContext<*, ApplicationCall>.call: ApplicationCall get() = context
 
 
 
@@ -72,9 +66,8 @@ inline val PipelineContext<*, ApplicationCall>.call: ApplicationCall get() = con
 @ContextDsl
 fun Route.route(path: String, method: HttpMethod, build: Route.() -> Unit): Route {
     val selector = HttpMethodRouteSelector(method)
-    val route = createRouteFromPath(path).createChild(selector).apply(build)
 
-    return route
+    return createRouteFromPath(path).createChild(selector).apply(build)
 }
 
 

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="kjstor">
+    <output-path>$PROJECT_DIR$/kjstor/build/libs</output-path>
+    <root id="archive" name="kjstor.jar">
+      <element id="module-output" name="KjsTor.kjstor.main" />
+    </root>
+  </artifact>
+</component>

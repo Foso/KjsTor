@@ -18,22 +18,17 @@ open class Route(val parent: Route?, val selector: RouteSelector) : ApplicationC
     val children: List<Route> get() = childList
 
     private val childList: MutableList<Route> = ArrayList()
-    val bodies = ArrayList<dui>()
+    private val bodies = ArrayList<dui>()
 
     private var cachedPipeline: ApplicationCallPipeline? = null
 
-    internal val handlers = ArrayList<PipelineInterceptor<Unit, ApplicationCall>>()
+    val handlers = ArrayList<PipelineInterceptor<Unit, ApplicationCall>>()
     var routiList : MutableList<Routi> = mutableListOf()
 
 
-    var path =""
 
-    fun addPath(path:String){
-        this.path= path
-    }
     fun myAddChild(route: Routi){
        if( routiList.none() { it.path == route.path }){
-           console.log("Myaddchild")
            routiList.add(route)
        }
 

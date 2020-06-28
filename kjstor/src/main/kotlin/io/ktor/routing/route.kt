@@ -92,7 +92,15 @@ fun Route.contentType(contentType: ContentType, build: Route.() -> Unit): Route 
 fun Route.get2(path: String, body: PipelineInterceptor<Unit, ApplicationCall>): Route {
 
 console.log("GETS2")
-    return route(path, HttpMethod.Get) { handle(body) }
+    val ro =  route(path, HttpMethod.Get) { handle(body) }
+    this.application.apply {
+        if(environment.route==null){
+            environment.route = ro
+        }
+        environment.route?.handle(body)
+    }
+
+    return ro
 }
 
 /**

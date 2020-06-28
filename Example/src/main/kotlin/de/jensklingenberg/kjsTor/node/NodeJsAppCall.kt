@@ -1,10 +1,8 @@
-package de.jensklingenberg.kjsTor
+package de.jensklingenberg.kjsTor.node
 
 import http.IncomingMessage
 import http.ServerResponse
 import io.ktor.application.Application
-import io.ktor.http.*
-import io.ktor.http.content.TextContent
 import io.ktor.server.engine.BaseApplicationCall
 
 

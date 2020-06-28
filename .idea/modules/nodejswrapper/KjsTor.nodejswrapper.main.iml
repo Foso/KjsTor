@@ -2,11 +2,11 @@
 <module version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="false" externalProjectId=":nodektor" pureKotlinSourceFolders="$MODULE_DIR$/../../../nodektor/src/test/kotlin;/home/jens/Code/2020/KjsTor/nodektor/src/main/kotlin">
+      <configuration version="3" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="false" externalProjectId=":nodejswrapper" pureKotlinSourceFolders="$MODULE_DIR$/../../../nodejswrapper/src/test/kotlin;/home/jens/Code/2020/KjsTor/nodejswrapper/src/main/kotlin">
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <compilerSettings />
         <compilerArguments>
-          <option name="outputFile" value="$MODULE_DIR$/../../../build/js/packages/KjsTor-nodektor/kotlin/KjsTor-nodektor.js" />
+          <option name="outputFile" value="$MODULE_DIR$/../../../build/js/packages/KjsTor-nodejswrapper/kotlin/KjsTor-nodejswrapper.js" />
           <option name="noStdlib" value="true" />
           <option name="sourceMap" value="true" />
           <option name="metaInfo" value="true" />

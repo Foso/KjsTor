@@ -1,4 +1,4 @@
-package de.jensklingenberg.kjsTor
+package de.jensklingenberg.kjsTor.node
 
 import de.jensklingenberg.mapEntriesOf
 

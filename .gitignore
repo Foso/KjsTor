@@ -1,3 +1,5 @@
 /build/
 /KjsTor/build/
 /.gradle/
+/Example/build/kotlin/compileKotlinJs/
+.idea

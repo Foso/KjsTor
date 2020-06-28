@@ -1,4 +1,4 @@
-package de.jensklingenberg.kjsTor
+package de.jensklingenberg.kjsTor.node
 
 import Buffer
 
@@ -6,6 +6,8 @@ import Buffer
 import http.Server
 import http.ServerResponse
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.http.HttpMethod
 import io.ktor.http.content.LocalFileContent
 import io.ktor.http.content.TextContent
@@ -14,10 +16,17 @@ import io.ktor.routing.*
 import io.ktor.server.engine.ApplicationEngineEnvironment
 import io.ktor.server.engine.BaseApplicationEngine
 import io.ktor.server.engine.EnginePipeline
+import io.ktor.util.pipeline.Pipeline
 import io.ktor.util.pipeline.PipelinePhase
+import io.ktor.util.pipeline.execute
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+suspend inline fun <TContext : Any> Pipeline<Unit, TContext>.execute(context: TContext): Unit = execute(context, Unit)
+
+suspend inline fun ApplicationCall.respond2(message: Any) {
+    response.pipeline.execute(this, message)
+}
 
 class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val configure: Configuration.() -> Unit = {}) :
     BaseApplicationEngine(environment) {
@@ -25,7 +34,8 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
 
     }
 
-    private val configuration = Configuration().apply(configure)
+    private val configuration = Configuration()
+        .apply(configure)
     lateinit var server: Server
 
     private val port = environment.connectors.first().port
@@ -52,45 +62,58 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
             Application(environment).myfunc()
         }
 
-
         environment.start()
         server = http.createServer { req, res ->
-            console.log("REQU" + req.rawHeaders)
-
 
             val myAppCall =
                 MyNodeJsAppCall(environment.application, req, res)
 
-
             var bestRoute: Route? = null
             environment.route?.run {
+                console.log("CHILDS" + this.handlers.size)
+                this.handlers.forEach { pip ->
+                    console.log("INVO "+pip.toString())
 
+
+
+                    pipeline.addPhase(ApplicationCallPipeline.Call)
+                    pipeline.intercept(ApplicationCallPipeline.Call, pip)
+                    GlobalScope.launch(environment.parentCoroutineContext) {
+                        pipeline.execute(myAppCall)
+                        myAppCall.respond2("AA")
+
+                        pipeline.intercept(ApplicationCallPipeline.Call) {
+
+                            pip.invoke(this, {
+                                console.log("UNIT")
+                            }())
+                        }
+
+                    }
+
+                }
                 val routing = Routing(environment.application)
 
                 this.routiList.forEach {
                     val ro = it
-                    console.log("RO" + ro.path)
+
                     val selector = HttpMethodRouteSelector(ro.method)
                     routing.createRouteFromPath(ro.path).createChild(selector).myAddChild(it)
                 }
 
 
+                val root = routing
                 val resolveContext = RoutingResolveContext(routing, myAppCall, emptyList())
 
-                val root = routing
-                val rootResult = root.selector.evaluate(resolveContext, 0)
 
-                console.log("INCR " + rootResult.segmentIncrement)
+                val rootResult = root.selector.evaluate(resolveContext, 0)
                 val result = resolveContext.resolve(root, rootResult.segmentIncrement)
 
                 if (rootResult.succeeded) {
                     bestRoute = result.route
-                    bestRoute?.routiList!!.forEach {
-                        console.log("HEYROUTE " + it.path)
-                    }
+
                 }
-                console.log("SUCS" + result.route)
-                console.log(result)
+
 
             }
 
@@ -106,13 +129,6 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
                     }
                 }
             }
-            console.log("SIZE" + environment.route?.routiList?.size)
-            environment.route?.routiList?.forEach {
-                console.log("NodeJsApplicationEngine " + it.path + " " + it.method)
-            }
-
-
-
 
             environment.route?.routiList?.firstOrNull {
                 (myAppCall.request.method == it.method) &&
@@ -125,6 +141,8 @@ class NodeJsApplicationEngine(environment: ApplicationEngineEnvironment, val con
 
 
                     GlobalScope.launch(environment.parentCoroutineContext) {
+                        myAppCall.response.pipeline.execute(myAppCall, "Hall")
+
                         routi.routeHandler(myAppCall)
                         when (myAppCall.request.method) {
                             HttpMethod.Post -> {

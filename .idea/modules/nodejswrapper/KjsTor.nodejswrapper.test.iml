@@ -2,22 +2,22 @@
 <module version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="true" externalProjectId=":KjsTor" pureKotlinSourceFolders="$MODULE_DIR$/../../../KjsTor/src/test/kotlin;/home/jens/Code/2020/KjsTor/KjsTor/src/main/kotlin">
+      <configuration version="3" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="true" externalProjectId=":nodejswrapper" pureKotlinSourceFolders="$MODULE_DIR$/../../../nodejswrapper/src/test/kotlin;/home/jens/Code/2020/KjsTor/nodejswrapper/src/main/kotlin">
         <sourceSets>
-          <sourceSet>KjsTor.KjsTor.main</sourceSet>
+          <sourceSet>KjsTor.nodejswrapper.main</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>
-          <externalSystemTestTask>nodeTest|:KjsTor:test|Js</externalSystemTestTask>
+          <externalSystemTestTask>nodeTest|:nodejswrapper:test|Js</externalSystemTestTask>
         </externalSystemTestTasks>
         <compilerSettings />
         <compilerArguments>
-          <option name="outputFile" value="$MODULE_DIR$/../../../build/js/packages/KjsTor-KjsTor-test/kotlin/KjsTor-KjsTor-test.js" />
+          <option name="outputFile" value="$MODULE_DIR$/../../../build/js/packages/KjsTor-nodejswrapper-test/kotlin/KjsTor-nodejswrapper-test.js" />
           <option name="noStdlib" value="true" />
           <option name="sourceMap" value="true" />
           <option name="metaInfo" value="true" />
           <option name="target" value="v5" />
-          <option name="moduleKind" value="umd" />
+          <option name="moduleKind" value="commonjs" />
           <option name="main" value="call" />
           <option name="languageVersion" value="1.3" />
           <option name="apiVersion" value="1.3" />
